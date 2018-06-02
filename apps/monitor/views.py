@@ -39,7 +39,6 @@ class GetRedisInfo(LoginRequiredMixin, View):
                 info_dict.update(host=client.connection_pool.connection_kwargs['host'])
                 info_dict.update(redis_id=ser.redis)
                 data.append(info_dict)
-
         return render(request, 'index.html', {
             'data': data,
             'console': 'console',

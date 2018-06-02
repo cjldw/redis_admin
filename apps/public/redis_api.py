@@ -4,7 +4,7 @@ import socket
 import sys
 
 from conf import logs
-from conf.conf import base, socket_timeout,  scan_batch
+from conf.conf import base, socket_timeout, scan_batch
 from redis.exceptions import (
     RedisError,
     ConnectionError,
@@ -58,7 +58,7 @@ def get_client(*args, **kwargs):
             connect(*args, **kwargs)
             server_ip = kwargs['host']
             db_index = kwargs['db']
-            
+
     global client
     if client:
         return client
@@ -80,14 +80,14 @@ def get_all_keys_dict(client=None):
     m_all.sort()
     me = {}
     for key in m_all:
-        if len(key)>100:
+        if len(key) > 100:
             continue
         key_levels = key.split(base['seperator'])
         cur = me
         for lev in key_levels:
             if cur.has_key(lev):
-                if cur.keys()==0:
-                    cur[lev] = {lev:{}}#append(lev)
+                if cur.keys() == 0:
+                    cur[lev] = {lev: {}}  # append(lev)
             else:
                 cur[lev] = {}
             cur = cur[lev]
@@ -100,8 +100,11 @@ def get_all_keys_tree(client=None, key='*', cursor=0, min_num=None, max_num=None
     if key == '*':
         next_cursor, key_all = client.scan(cursor=cursor, match=key, count=scan_batch)
     else:
-        key = '*%s*' % key
-        next_cursor, key_all = 0, client.keys(key)
+        # key = '*%s*' % key
+        # next_cursor, key_all = 0, client.keys(key) # keys online will deny all thread execute, so disabled it
+        next_cursor, key_all = 0, []
+        if client.exists(key):
+            key_all = [key]
     key_all = key_all[min_num:max_num]
     key_all.sort()
     return key_all
@@ -153,6 +156,7 @@ class Connection(redis.Connection):
     """
     继承redis Connection
     """
+
     def connect(self):
         "Connects to the Redis server if not already connected"
         if self._sock:
@@ -188,7 +192,7 @@ class Connection(redis.Connection):
                 raise AuthenticationError('Invalid Password')
 
         # if a database is specified, switch to it
-        if self.db >= 0: # 密码为空，切换db判断是否需要认证
+        if self.db >= 0:  # 密码为空，切换db判断是否需要认证
             self.send_command('SELECT', self.db)
             if nativestr(self.read_response()) != 'OK':
                 raise ConnectionError('Invalid Database')

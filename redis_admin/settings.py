@@ -53,7 +53,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -85,14 +85,14 @@ WSGI_APPLICATION = 'redis_admin.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': database["name"],
-        'HOST': database["host"],
-        'USER': database["username"],
-        'PASSWORD': database["password"],
-        'PORT': database["port"]
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': 'sqlite',
+        # 'ENGINE': 'django.db.backends.mysql',
+        # 'NAME': database["name"],
+        # 'HOST': database["host"],
+        # 'USER': database["username"],
+        # 'PASSWORD': database["password"],
+        # 'PORT': database["port"]
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 

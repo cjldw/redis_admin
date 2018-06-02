@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.http.response import JsonResponse
+from django.core.exceptions import ObjectDoesNotExist
 from .models import DctUser
 from .forms import LoginForms
 
@@ -15,7 +16,7 @@ from utils.utils import LoginRequiredMixin
 from public.menu import Menu
 from users.models import Auth, RedisConf
 from public.sendmail import send_email
-from conf.conf import mail_receivers
+from conf.conf import admin_mail
 from conf import logs
 
 # Create your views here.
@@ -67,6 +68,11 @@ class LoginViews(View):
                         redis_name = RedisConf.objects.get(id=ser.redis)
                         user_premission[redis_name.name] = ser.pre_auth
                     data["data"] = user_premission
+                    data["menu"] = Menu(user=user)
+                    left_menu = []
+                    for i in data['menu']:
+                        left_menu.append(i['name'])
+                    data['left_menu'] = left_menu
                     return JsonResponse(data)
                 else:
                     data["code"] = 1
@@ -98,7 +104,6 @@ class ChangeUser(LoginRequiredMixin, View):
             })
 
     def post(self, request):
-        menu = Menu(user=request.user)
 
         id = request.POST.get('id', None)
         password1 = request.POST.get('password1', None)
@@ -184,24 +189,57 @@ class ChangeUser(LoginRequiredMixin, View):
             error = e
 
         return render(request, 'change_user.html', {
-            'menu': menu,
             'user_info': user,
             'error': error
         })
 
 
+class EditUser(LoginRequiredMixin, View):
+    def post(self, request):
+        data = {'code': 0, 'data': '', 'msg': '成功'}
+        user_id = request.POST.get('id', None)
+        is_superuser = request.POST.get('is_superuser', None)
+        is_active = request.POST.get('is_active', None)
+        if user_id is None:
+            data['code'] = 1
+            data['msg'] = 'id is not None'
+            return JsonResponse(data=data)
+
+        try:
+            user_obj = DctUser.objects.get(id=user_id)
+        except Exception as e:
+            logs.error(e)
+            data['code'] = 1
+            data['msg'] = '内部错误,请联系管理员!'
+            return JsonResponse(data=data)
+
+        if is_superuser is None and is_active is None:
+            data['code'] = 1
+            data['msg'] = '参数错误'
+        elif is_superuser:
+            if is_superuser == 'true':
+                user_obj.is_superuser = True
+            elif is_superuser == 'false':
+                user_obj.is_superuser = False
+            user_obj.save()
+        elif is_active:
+            if is_active == 'true':
+                user_obj.is_active = True
+            elif is_active == 'false':
+                user_obj.is_active = False
+            user_obj.save()
+        return JsonResponse(data=data)
+
+
 class AddUser(LoginRequiredMixin, View):
     def get(self, request):
-        menu = Menu(user=request.user)
         redis = RedisConf.objects.all()
 
         return render(request, 'add_user.html', {
-            'menu': menu,
             'rediss': redis,
         })
 
     def post(self, request):
-        menu = Menu(user=request.user)
 
         username = request.POST.get('username', None)
         password1 = request.POST.get('password1', None)
@@ -240,7 +278,6 @@ class AddUser(LoginRequiredMixin, View):
                 return HttpResponseRedirect(reverse("user_manage"))
             except Exception as e:
                 return render(request, 'add_user.html', {
-                    'menu': menu,
                     'user_error': e,
                 })
 
@@ -261,11 +298,15 @@ class UserRegisterView(View):
         )
         if username is not None and password1 == password2 and email is not None:
             try:
-                user = DctUser.objects.create_user(username=username, email=email, password=password1)
-                send_email("用户注册", u"用户:{0}，邮箱:{1} \n\t注册redis管理平台请分配权限".format(username, email),
-                           receivers=mail_receivers)
+                DctUser.objects.get(Q(username__iexact=username) | Q(email__iexact=email))
+                data["code"] = 1
+                data["msg"] = "用户已被注册"
+            except ObjectDoesNotExist:
+                DctUser.objects.create_user(username=username, email=email, password=password1)
+                send_email("[redis管理平台]用户注册", u"用户:{0}，邮箱:{1} \n\t注册redis管理平台请分配权限".format(username, email),
+                           receivers=admin_mail)
                 data["code"] = 0
-                data["msg"] = "注册成功,联系管理员分配权限中。"
+                data["msg"] = "注册成功"
             except Exception as e:
                 data["code"] = 1
                 data["msg"] = '{0}'.format(e)

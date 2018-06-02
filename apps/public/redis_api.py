@@ -126,11 +126,8 @@ def check_redis_connect(name):
     try:
         logs.debug("host:{0},port:{1},password:{2},timeout:{3}".format(
             redis_conf.host, redis_conf.port, redis_conf.password, socket_timeout))
-        if redis_conf.socket:
-            conn = Connection(unix_socket_path=redis_conf.socket, password=redis_conf.password,
-                              socket_timeout=socket_timeout)
-        else:
-            conn = Connection(host=redis_conf.host, port=redis_conf.port, socket_timeout=socket_timeout)
+        conn = Connection(host=redis_conf.host, port=redis_conf.port,
+                          password=redis_conf.password, socket_timeout=socket_timeout)
         conn.connect()
         return True
     except Exception as e:
@@ -146,18 +143,10 @@ def get_cl(redis_name, db_id=0):
     cur_db_index = int(db_id)
     server = get_redis_conf(name=redis_name)
     if server is not False:
-        if server.socket is not None:
-            "link with socket"
-            if server.password is None:
-                cl = get_client(unix_socket_path=server.socket, password=None)
-            else:
-                cl = get_client(unix_socket_path=server.socket, password=server.password)
+        if server.password is None:
+            cl = get_client(host=server.host, port=server.port, db=cur_db_index, password=None)
         else:
-            "link with tcp"
-            if server.password is None:
-                cl = get_client(host=server.host, port=server.port, db=cur_db_index, password=None)
-            else:
-                cl = get_client(host=server.host, port=server.port, db=cur_db_index, password=server.password)
+            cl = get_client(host=server.host, port=server.port, db=cur_db_index, password=server.password)
         return cl, redis_name, cur_db_index
     else:
         return False

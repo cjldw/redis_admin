@@ -10,7 +10,6 @@ class RedisConf(models.Model):
     name = models.CharField(max_length=10, verbose_name=u"名称")
     host = models.CharField(max_length=15, verbose_name=u"IP地址")
     port = models.IntegerField(default=6379, verbose_name=u"端口")
-    socket = models.CharField(default="", max_length=64, verbose_name=u"本地socket地址")
     password = models.CharField(null=True, blank=True, max_length=30, verbose_name=u"密码")
     database = models.IntegerField(default=16, verbose_name=u"db数")
 

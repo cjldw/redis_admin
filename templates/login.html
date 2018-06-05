@@ -45,6 +45,7 @@
                 data: $('#from').serialize(),
                 success: function (result) {
                     if (result.code == 0) {
+                        console.log(result.data);
                         for (var item in result.data) {
                             layui.data('premission', {
                                 key: item,

@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-from users.views import LoginViews, LogoutView
+from users.views import LoginViews, LogoutView, MenuView
 from loginfo.views import OperationInfoEditView, OperationInfoDelView, UserManageView
 from users.views import ChangeUser, AddUser, UserRegisterView, EditUser
 from monitor.views import (GetKeyView,
@@ -42,6 +42,7 @@ urlpatterns = [
     url(r'^error/$', RedisErrorHtmlView.as_view(), name='redis_error'),
     url(r'^login/$', LoginViews.as_view(), name='login'),
     url(r'^logout/$', LogoutView.as_view(), name='logout'),
+    url(r'^menu/$', MenuView.as_view(), name='menu'),
     url(r'^(?P<redis_name>\w+)/db(?P<id>[0-9]+)/$', GetIdView.as_view(), name='getid'),
     url(r'^get_key/(?P<redis_name>\w+)/(?P<db_id>[0-9]+)/$', GetKeyView.as_view(), name='getkey'),
     url(r'^view/(?P<redis_name>\w+)/(?P<value_db_id>[0-9]+)/(?P<key>.*)/$', GetValueView.as_view(),

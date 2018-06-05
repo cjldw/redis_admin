@@ -19,6 +19,7 @@ from public.sendmail import send_email
 from conf.conf import admin_mail
 from conf import logs
 
+
 # Create your views here.
 
 
@@ -83,6 +84,23 @@ class LoginViews(View):
         return JsonResponse(data)
 
 
+class MenuView(LoginRequiredMixin, View):
+    def get(self, request):
+        server_list = get_redis_conf(name=None, user=request.user)
+        user_permission = []
+        left_menu = []
+        for server in server_list:
+            redis_name = RedisConf.objects.get(id=server.redis)
+            if not redis_name:
+                continue
+            user_permission["meetuptime"] = server.pre_auth
+            menu = Menu(user=request.user)
+            for i in menu:
+                left_menu.append(i['name'])
+            data = {"data": user_permission, "menu": menu, "left_menu": left_menu}
+        return JsonResponse(data)
+
+
 class ChangeUser(LoginRequiredMixin, View):
     def get(self, request):
         menu = Menu(user=request.user)
@@ -126,7 +144,7 @@ class ChangeUser(LoginRequiredMixin, View):
                     # ''为删除权限
                     user.auths.get(redis=re.id).delete()
                 except Exception as e:
-                    logs.error(u"删除权限失败:user_id:{0},redis:{1},msg:{2}".format(id,re.id,e))
+                    logs.error(u"删除权限失败:user_id:{0},redis:{1},msg:{2}".format(id, re.id, e))
                 continue
 
             pre_auth = int(re_id)  # 权限数
@@ -316,4 +334,3 @@ class UserRegisterView(View):
             data["code"] = 1
             data["msg"] = "error"
         return JsonResponse(data=data, safe=False)
-

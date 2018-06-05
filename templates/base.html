@@ -12,6 +12,7 @@
     {% block headerjs %}{% endblock %}
 </head>
 <body>
+
 <div class="layui-layout layui-layout-admin">
     <div class="layui-header">
         <div class="layui-logo layui-bg-blue">Redis管理平台</div>
@@ -50,6 +51,7 @@
         </div>
     </div>
 
+
     <div class="layui-body">
         <!-- 内容主体区域 -->
         <div style="padding: 15px;">
@@ -69,23 +71,28 @@
 </div>
 {% block endjs %}{% endblock %}
 
+
+<script>
+    layui.use('element', function(){
+  var element = layui.element;
+
+  //一些事件监听
+  element.on('nav(nav)', function(data){
+    console.log(data);
+  });
+});
+</script>
+
+
 {% verbatim %}
 <script id="demo" type="text/html">
     <ul class="layui-nav layui-nav-tree" lay-filter="test">
         {{# layui.each(d.list, function(index, item){ }}
-        {{# if(d.one === item.name){ }}
-        <li class="layui-nav-item layui-nav-itemed">
-            {{# } else { }}
-        <li class="layui-nav-item ">
-            {{# } }}
+        <li class="layui-nav-item">
             <a class="" href="javascript:;">{{ item.name }}</a>
             <dl class="layui-nav-child">
                 {{# layui.each(item.db, function(index, dbs){ }}
-                {{# if(d.two === dbs && d.one === item.name){ }}
-                <dd class="layui-this">
-                    {{# } else { }}
                 <dd class="">
-                    {{# } }}
                     <a href="/{{ item.name }}/{{ dbs }}/">{{ dbs }}</a>
                 </dd>
                 {{# }); }}
@@ -97,64 +104,23 @@
 {% endverbatim %}
 <script>
     //JavaScript代码区域
-    layui.use(['element', 'jquery', 'laytpl'], function () {
+    layui.use(["element", 'laytpl'], function () {
         var element = layui.element;
         var jQuery = layui.jquery;
         var laytpl = layui.laytpl;
-
         jQuery.get("/menu/").then(function (resp) { // 获取当前菜单
             if (resp.code != 0) {
                 layui.alert("菜单异常, 请联系管理员！");
                 return;
             }
-            layui.data("menu", null);
-            layui.data("premission", null);
-            layui.data("menu", {
-                key: "list",
-                value: resp.menu.list
-            });
-            layui.data("menu", {
-                key: "left_menu",
-                value: resp.menu.left_menu
-            });
-            for (redis in resp.premission) {
-                layui.data("premission", {
-                    key: redis,
-                    value: resp.premission[redis]
-                });
-            }
-            var data = layui.data("menu");
-            console.log(element);
-            element.on('nav(test)', function (elem) {
-                layui.each(data.list, function (index, item) {
-                    if (item.name === elem.text()) {
-                        if (elem.text() === data.one) {
-                            layui.data('menu', {
-                                key: 'one',
-                                value: ''
-                            })
-                        } else {
-                            layui.data('menu', {
-                                key: 'one',
-                                value: elem.text()
-                            })
-                        }
-                    } else if (item.name !== elem.text()) {
-                        layui.data('menu', {
-                            key: 'two',
-                            value: elem.text()
-                        })
-                    }
-                });
-            });
-            return resp;
-        }).done(function (resp) {
-            var data = layui.data("menu");
+            var data = resp.menu;
             var getTpl = demo.innerHTML;
             var view = document.getElementById('menu');
             laytpl(getTpl).render(data, function (html) {
                 view.innerHTML = html;
             });
+            element.render("nav", "test");
+            return resp;
         });
         jQuery.ajaxSetup({ // 设置CSRF Token
             headers: {'X-CSRFToken': Cookies.get('csrftoken')}

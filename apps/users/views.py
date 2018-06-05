@@ -87,17 +87,17 @@ class LoginViews(View):
 class MenuView(LoginRequiredMixin, View):
     def get(self, request):
         server_list = get_redis_conf(name=None, user=request.user)
-        user_permission = []
-        left_menu = []
+        user_permission = dict()
         for server in server_list:
             redis_name = RedisConf.objects.get(id=server.redis)
             if not redis_name:
                 continue
-            user_permission["meetuptime"] = server.pre_auth
-            menu = Menu(user=request.user)
-            for i in menu:
-                left_menu.append(i['name'])
-            data = {"data": user_permission, "menu": menu, "left_menu": left_menu}
+            user_permission[redis_name.name] = server.pre_auth
+        menu = Menu(user=request.user)
+        left_menu = []
+        for i in menu:
+            left_menu.append(i['name'])
+        data = {"code": 0, "msg": "success", "premission": user_permission, "menu": {"list": menu, "left_menu": left_menu}}
         return JsonResponse(data)
 
 

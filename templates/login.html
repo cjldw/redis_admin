@@ -45,7 +45,7 @@
                 data: $('#from').serialize(),
                 success: function (result) {
                     if (result.code == 0) {
-                        console.log(result.data);
+                        /*console.log(result.data);
                         for (var item in result.data) {
                             layui.data('premission', {
                                 key: item,
@@ -61,7 +61,7 @@
                         layui.data('menu', {
                             key: 'left_menu',
                             value: result.left_menu
-                        });
+                        });*/
                         window.location.href = '/?pre=true'
                     } else {
                         layer.msg(result.msg);

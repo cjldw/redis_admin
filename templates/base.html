@@ -113,7 +113,14 @@
                 layui.alert("菜单异常, 请联系管理员！");
                 return;
             }
-            var data = resp.menu;
+            layui.data("premission", null);
+            for (redis in resp.premission) {
+                layui.data("premission", {
+                    key: redis,
+                    value: resp.premission[redis]
+                });
+            }
+            var data = layui.data("menu");
             var getTpl = demo.innerHTML;
             var view = document.getElementById('menu');
             laytpl(getTpl).render(data, function (html) {

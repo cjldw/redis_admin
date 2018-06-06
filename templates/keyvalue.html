@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
+<blockquote class="layui-elem-quote">当前 <span class="layui-badge layui-bg-black">{{ redis_name }}/{{ db_num }}</span>，
+    搜索只支持精确匹配！</blockquote>
 <div class="demoTable">
   搜索：
   <div class="layui-inline">
@@ -51,6 +53,11 @@ layui.use('table', function(){
       });
     },
     addkey: function () {
+        if (auth == 1) {
+            layer.msg("您没有权限噢 😯");
+            layer.closeAll('loading')
+            return;
+        }
         window.location.href="/add/key/{{ redis_name }}/?db={{ db_id }}"
     }
   };

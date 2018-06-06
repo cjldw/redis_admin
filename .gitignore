@@ -2,3 +2,4 @@
 *.pyc
 virtualenv
 log/*.log
+db.sqlite3

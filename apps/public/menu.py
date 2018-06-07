@@ -5,6 +5,7 @@ __date__ = '2017/10/12'
 
 from public.redis_api import get_tmp_client, check_redis_connect, get_redis_conf, get_cl
 from users.models import RedisConf
+from django.core.exceptions import ObjectDoesNotExist
 
 
 def Menu(user):
@@ -16,7 +17,10 @@ def Menu(user):
     data = []
     m_index = 0
     for ser in servers:
-        redis_obj = RedisConf.objects.get(id=ser.redis)
+        try:
+            redis_obj = RedisConf.objects.get(id=ser.redis)
+        except ObjectDoesNotExist:
+            continue
         data_is = {'name': redis_obj.name, 'db': ''}
         status = check_redis_connect(name=redis_obj.name)
         if isinstance(status, bool) and status:

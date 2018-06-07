@@ -13,7 +13,9 @@ from conf.conf import scan_batch
 from public.menu import Menu
 from public.redis_api import get_cl, get_redis_conf, redis_conf_save, check_redis_connect
 from utils.utils import LoginRequiredMixin
+from django.core.exceptions import ObjectDoesNotExist
 from forms import RedisForm
+
 # from public.user_premission import object_user_premission
 # Create your views here.
 
@@ -28,7 +30,10 @@ class GetRedisInfo(LoginRequiredMixin, View):
         servers = get_redis_conf(name=None, user=request.user)
         data = []
         for ser in servers:
-            redis_obj = RedisConf.objects.get(id=ser.redis)
+            try:
+                redis_obj = RedisConf.objects.get(id=ser.redis)
+            except ObjectDoesNotExist:
+                continue
             status = check_redis_connect(name=redis_obj.name)
             if status is True:
                 client, cur_server_index, cur_db_index = get_cl(redis_name=redis_obj.name)
@@ -65,7 +70,10 @@ class CheckRedisContent(LoginRequiredMixin, View):
         servers = get_redis_conf(name=None, user=request.user)
         list = []
         for ser in servers:
-            redis_obj = RedisConf.objects.get(id=ser.redis)
+            try:
+                redis_obj = RedisConf.objects.get(id=ser.redis)
+            except ObjectDoesNotExist:
+                continue
             status = check_redis_connect(name=redis_obj.name)
             if status is not True:
                 info_dict = {'name': status["redis"].name, 'host': status["redis"].host, 'port': status["redis"].port,

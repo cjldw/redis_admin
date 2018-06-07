@@ -55,7 +55,6 @@ class LoginViews(View):
             data="",
         )
         login_form = LoginForms(request.POST)
-        nexts = request.get_full_path(force_append_slash=True)
         if login_form.is_valid():
             user_name = request.POST.get("username", "")
             pass_word = request.POST.get("password", "")
@@ -66,8 +65,11 @@ class LoginViews(View):
                     servers = get_redis_conf(name=None, user=request.user)
                     user_premission = dict()
                     for ser in servers:
-                        redis_name = RedisConf.objects.get(id=ser.redis)
-                        user_premission[redis_name.name] = ser.pre_auth
+                        try:
+                            redis_name = RedisConf.objects.get(id=ser.redis)
+                            user_premission[redis_name.name] = ser.pre_auth
+                        except ObjectDoesNotExist:
+                            continue
                     data["data"] = user_premission
                     data["menu"] = Menu(user=user)
                     left_menu = []
@@ -89,8 +91,9 @@ class MenuView(LoginRequiredMixin, View):
         server_list = get_redis_conf(name=None, user=request.user)
         user_permission = dict()
         for server in server_list:
-            redis_name = RedisConf.objects.get(id=server.redis)
-            if not redis_name:
+            try:
+                redis_name = RedisConf.objects.get(id=server.redis)
+            except ObjectDoesNotExist:
                 continue
             user_permission[redis_name.name] = server.pre_auth
         menu = Menu(user=request.user)

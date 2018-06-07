@@ -120,7 +120,7 @@
                     value: resp.premission[redis]
                 });
             }
-            var data = layui.data("menu");
+            var data = resp.menu;
             var getTpl = demo.innerHTML;
             var view = document.getElementById('menu');
             laytpl(getTpl).render(data, function (html) {

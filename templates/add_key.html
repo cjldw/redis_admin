@@ -5,6 +5,8 @@
 {% endblock %}
 
 {% block content %}
+    <button class="layui-btn" onclick="javascript:window.history.back()">返回</button>
+    <hr>
     <div class="layui-tab">
         <ul class="layui-tab-title">
             <li {% ifequal this_tab 'string' %}class="layui-this"{% endifequal %}>string</li>
@@ -35,7 +37,7 @@
                         <label class="layui-form-label">ttl</label>
                         <div class="layui-input-inline">
                             <input type="text" name="ttl" required lay-verify="required|number" placeholder="请输入ttl"
-                                   value="{{ ttl }}" autocomplete="off" class="layui-input">
+                                   value="-1" autocomplete="off" class="layui-input">
                         </div>
                         <div class="layui-form-mid layui-word-aux"></div>
                     </div>
@@ -77,6 +79,14 @@
                             <div class="layui-input-inline">
                                 <input type="text" name="type" required lay-verify="required" placeholder=""
                                        readonly="readonly" value="zset" autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">ttl</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="ttl" required lay-verify="required|number" placeholder="请输入ttl"
+                                       value="-1" autocomplete="off" class="layui-input">
                             </div>
                             <div class="layui-form-mid layui-word-aux"></div>
                         </div>
@@ -137,6 +147,14 @@
                             <div class="layui-form-mid layui-word-aux"></div>
                         </div>
                         <div class="layui-form-item">
+                            <label class="layui-form-label">ttl</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="ttl" required lay-verify="required|number" placeholder="请输入ttl"
+                                       value="-1" autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        <div class="layui-form-item">
                             <label class="layui-form-label">db</label>
                             <div class="layui-input-inline">
                                 <input type="text" name="db_id" required lay-verify="required|number"
@@ -180,6 +198,14 @@
                             <div class="layui-input-inline">
                                 <input type="text" name="type" required lay-verify="required" placeholder=""
                                        readonly="readonly" value="hash" autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">ttl</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="ttl" required lay-verify="required|number" placeholder="请输入ttl"
+                                       value="-1" autocomplete="off" class="layui-input">
                             </div>
                             <div class="layui-form-mid layui-word-aux"></div>
                         </div>
@@ -236,6 +262,14 @@
                             <div class="layui-input-inline">
                                 <input type="text" name="type" required lay-verify="required" placeholder=""
                                        readonly="readonly" value="list" autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">ttl</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="ttl" required lay-verify="required|number" placeholder="请输入ttl"
+                                       value="-1" autocomplete="off" class="layui-input">
                             </div>
                             <div class="layui-form-mid layui-word-aux"></div>
                         </div>

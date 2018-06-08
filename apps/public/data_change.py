@@ -67,7 +67,7 @@ class ChangeData(object):
     def change_ttl(self, key, new):
         self.cl.expire(key, new)
 
-    def add_key(self, key, value, type, score=None, vkey=None):
+    def add_key(self, key, value, type, score=None, vkey=None, ttl=None):
         if type == 'string':
             self.cl.set(key, value)
         elif type == 'zset':
@@ -78,3 +78,6 @@ class ChangeData(object):
             self.cl.hset(key, vkey, value)
         elif type == 'list':
             self.cl.rpush(key, value)
+
+        if ttl is not None:
+            self.change_ttl(key, ttl)

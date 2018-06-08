@@ -16,6 +16,7 @@ from utils.utils import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from forms import RedisForm
 
+
 # from public.user_premission import object_user_premission
 # Create your views here.
 
@@ -173,6 +174,7 @@ class GetIdView(LoginRequiredMixin, View):
     """
     key列表
     """
+
     def get(self, request, redis_name, id):
         return render(request, 'keyvalue.html', {
             'db_id': id,
@@ -209,7 +211,6 @@ class ClientListView(LoginRequiredMixin, View):
 
 class ClientHtmlView(LoginRequiredMixin, View):
     def get(self, request, client_id):
-
         return render(request, 'client_list.html', {
             'client_id': client_id,
         })
@@ -258,6 +259,7 @@ class EditValueTableView(LoginRequiredMixin, View):
     """
     编辑value
     """
+
     def get(self, request, redis_name, edit_db_id):
         from public.redis_api import get_cl
         from public.data_view import get_value
@@ -346,6 +348,7 @@ class BgSaveView(LoginRequiredMixin, View):
     """
     保存数据 bgsave
     """
+
     def get(self, request, redis_id):
         redis_obj = RedisConf.objects.get(id=redis_id)
         cl, cur_server_index, cur_db_index = get_cl(redis_name=redis_obj.name, db_id=0)
@@ -358,6 +361,7 @@ class AddKeyView(LoginRequiredMixin, View):
     """
     添加数据
     """
+
     def get(self, request, redis_name):
         this_tab = 'string'
         db_id = request.GET.get('db', None)
@@ -373,20 +377,22 @@ class AddKeyView(LoginRequiredMixin, View):
         type = request.POST.get('type', None)
         key = request.POST.get('key', None)
         value = request.POST.get('value', None)
+        ttl = request.POST.get('ttl', None)
 
         ch_data = ChangeData(redis_name=redis_name, db_id=db_id)
         if type == 'string':
-            ch_data.add_key(key=key, value=value, type=type)
+            ch_data.add_key(key=key, value=value, type=type, ttl=ttl)
         elif type == 'zset':
             score = request.POST.get('score', None)
-            ch_data.add_key(key=key, value=value, score=int(score), type=type)
+            print("add data:", key, value, score, type, ttl, "---------------------")
+            ch_data.add_key(key=key, value=value, type=type, score=int(score), ttl=ttl)
         elif type == 'set':
-            ch_data.add_key(key=key, value=value, type=type)
+            ch_data.add_key(key=key, value=value, type=type, ttl=ttl)
         elif type == 'hash':
             vkey = request.POST.get('vkey', None)
-            ch_data.add_key(key=key, vkey=vkey, value=value, type=type)
+            ch_data.add_key(key=key, value=value, type=type, vkey=vkey, ttl=ttl)
         elif type == 'list':
-            ch_data.add_key(key=key, value=value, type=type)
+            ch_data.add_key(key=key, value=value, type=type, ttl=ttl)
 
         return HttpResponseRedirect('/' + redis_name + '/db' + db_id + '/')
 

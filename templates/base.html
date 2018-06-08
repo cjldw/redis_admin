@@ -19,6 +19,12 @@
         <!-- 头部区域（可配合layui已有的水平导航） -->
         <ul class="layui-nav layui-layout-left">
             <li class="layui-nav-item {% if console %}layui-this{% endif %}"><a href="/">控制台</a></li>
+            {% if user.is_superuser is True %}
+                <li class="layui-nav-item {% if top_menu == 'user' %}layui-this{% endif %}"><a
+                        href="/user/manage/">用户管理</a></li>
+                <li class="layui-nav-item {% if top_menu == 'conf' %}layui-this{% endif %}"><a href="/redis/list/">redis配置</a>
+                </li>
+            {% endif %}
             <li class="layui-nav-item {% if error %}layui-this{% endif %}"><a href="/error/">连接错误</a></li>
             <li class="layui-nav-item {% if record %}layui-this{% endif %}">
                 <a href="javascript:;">记录</a>
@@ -27,12 +33,6 @@
                     <dd><a href="{% url 'operation_del' %}">删除记录</a></dd>
                 </dl>
             </li>
-            {% if user.is_superuser is True %}
-                <li class="layui-nav-item {% if top_menu == 'user' %}layui-this{% endif %}"><a
-                        href="/user/manage/">用户管理</a></li>
-                <li class="layui-nav-item {% if top_menu == 'conf' %}layui-this{% endif %}"><a href="/redis/list/">redis配置</a>
-                </li>
-            {% endif %}
         </ul>
         <ul class="layui-nav layui-layout-right">
             <li class="layui-nav-item">

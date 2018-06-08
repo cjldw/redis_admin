@@ -403,6 +403,7 @@ class ClearDbView(LoginRequiredMixin, View):
     """
 
     def post(self, request):
+        return JsonResponse({"code": 1, "msg": "this operation not allow!", "data": ""})
         data = {"code": 0, "msg": "successful", "data": ""}
         redis_name = request.POST.get("redis_name", None)
         db_id = request.POST.get("db_id", None)

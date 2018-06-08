@@ -3,7 +3,7 @@
 {% block content %}
 <div class="layui-row layui-col-space20">
 {% for info in data %}
-      <div class="layui-col-md6">
+      <div class="layui-col-md4">
         <table class="layui-table" >
 			  <colgroup>
 			    <col width="15">
@@ -12,40 +12,27 @@
 			  </colgroup>
 			  <tbody>
 			    <tr>
-			      <td>IP地址</td>
-			      <td>{{ info.host }}</td>
+			      <td>连接信息</td>
+			      <td>IP: {{ info.host }} 端口: {{ info.tcp_port }}</td>
 			    </tr>
 			    <tr>
-			      <td>版本</td>
-			      <td>{{ info.redis_version }}</td>
+			      <td>系统信息</td>
+			      <td>系统: {{ info.os }} 版本: {{ info.redis_version }}</td>
 			    </tr>
 			    <tr>
-			      <td>端口</td>
-			      <td>{{ info.tcp_port }}</td>
+			      <td>运行信息</td>
+			      <td>内存: {{ info.used_memory_human }} 天数: {{ info.uptime_in_days }} 阻塞: {{ info.blocked_clients }}</td>
+			    </tr>
+			      <td>客户端数</td>
+			      <td>{{ info.connected_clients }}&nbsp&nbsp&nbsp&nbsp&nbsp
+                      <a href="/client/{{ info.redis_id }}/" class="layui-btn layui-btn-xs">查看</a>
+                  </td>
 			    </tr>
 			    <tr>
-			      <td>系统</td>
-			      <td>{{ info.os }}</td>
-			    </tr>
-			    <tr>
-			      <td>使用内存</td>
-			      <td>{{ info.used_memory_human }}</td>
-			    </tr>
-			    <tr>
-			      <td>运行天数</td>
-			      <td>{{ info.uptime_in_days }}天</td>
-			    </tr>
-			    <tr>
-			      <td>客户端数量</td>
-			      <td>{{ info.connected_clients }}&nbsp&nbsp&nbsp&nbsp&nbsp<a href="/client/{{ info.redis_id }}/" class="layui-btn layui-btn-small layui-btn-normal layui-btn-radius">查看详细客户端</a></td>
-			    </tr>
-			    <tr>
-			      <td>阻塞的客户端数</td>
-			      <td>{{ info.blocked_clients }}</td>
-			    </tr>
-			    <tr>
-			      <td>数据保存时间</td>
-			      <td>{{ info.rdb_last_save_time }}&nbsp&nbsp&nbsp&nbsp&nbsp<a href="/bgsave/{{ info.redis_id }}/" class="layui-btn layui-btn-small layui-btn-normal layui-btn-radius">保存数据</a></td>
+			      <td>数据保存</td>
+			      <td>{{ info.rdb_last_save_time }}&nbsp&nbsp&nbsp&nbsp&nbsp
+                      <a href="/bgsave/{{ info.redis_id }}/" class="layui-btn layui-btn-xs">保存</a>
+                  </td>
 			    </tr>
 			  </tbody>
 			</table>

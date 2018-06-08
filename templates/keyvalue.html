@@ -5,15 +5,20 @@
 <div class="demoTable">
   搜索：
   <div class="layui-inline">
-    <input class="layui-input" name="id" id="demoReload" autocomplete="off">
+    <input class="layui-input" name="id" maxlength="120" id="demoReload" autocomplete="off">
   </div>
-  <button class="layui-btn" data-type="reload">搜索</button>
+    <div class="layui-inline">
+        <button class="layui-btn layui-btn-danger" id="js-md5">MD5</button>
+    </div>
+    <div class="layui-inline">
+        <button class="layui-btn" data-type="reload">搜索</button>
+    </div>
   <div class="layui-inline">
 	  <button class="layui-btn layui-btn-normal" data-type="addkey">新增</button>
   </div>
-  <div class="layui-inline">
-	  <button class="layui-btn layui-btn-danger" id="clear">清空DB</button>
-  </div>
+{#  <div class="layui-inline">#}
+{#	  <button class="layui-btn layui-btn-danger" id="clear">清空DB</button>#}
+{#  </div>#}
 </div>
 
 
@@ -40,27 +45,27 @@ layui.use('table', function(){
     ,height: 600
   });
 
-  var $ = layui.$, active = {
-    reload: function(){
-      var demoReload = $('#demoReload');
-
-      table.reload('testReload', {
-        where: {
-          key: {
-            id: demoReload.val()
-          }
-        }
-      });
-    },
-    addkey: function () {
-        if (auth == 1) {
+    var E_md5 = $("#js-md5");
+    var E_demoReload = $("#demoReload");
+    var $ = layui.$, active = {
+        reload: function(){
+            table.reload('testReload', {
+                where: {
+                    key: {
+                        id: E_demoReload.val()
+                    }
+                }
+            });
+        },
+        addkey: function () {
+            if (auth != 1) {
+                window.location.href="/add/key/{{ redis_name }}/?db={{ db_id }}"
+                return;
+            }
             layer.msg("您没有权限噢 😯");
             layer.closeAll('loading')
-            return;
         }
-        window.location.href="/add/key/{{ redis_name }}/?db={{ db_id }}"
-    }
-  };
+    };
 
   table.on('tool(user)', function(obj){
     var data = obj.data;
@@ -84,10 +89,11 @@ layui.use('table', function(){
                     layer.msg('请求错误!', {icon: 5})
                 }
             });
-        } else {
-            layer.msg("您没有权限噢 😯");
-            layer.closeAll('loading')
+            return;
         }
+        layer.msg("您没有权限噢 😯");
+        layer.closeAll('loading')
+        return;
     } else if(obj.event === 'del'){
       if(auth === 3) {
           layer.confirm('真的删除么?', {
@@ -137,9 +143,10 @@ layui.use('table', function(){
         } else {
             layer.msg("您没有权限噢 😯");
             layer.closeAll('loading')
+            return;
         }
     } else if(obj.event === 'edit_ttl'){
-        if(auth === 3 || auth === 2 || auth === 1) {
+        if(auth != 1) {
             $.ajax({
                 url: '/view/{{ redis_name }}/{{ db_id }}/' + data.key + '/?type=ttl',
                 dataType: 'json',
@@ -151,7 +158,7 @@ layui.use('table', function(){
                         formType: 0,
                         value: datas.data
                     }, function (value, index, elem) {
-                        if(auth === 3) {
+                        if(auth != 1) {
                             layer.load();
                             $.ajax({
                                 url: '/view/{{ redis_name }}/{{ db_id }}/' + data.key + '/?type=ttl',
@@ -168,10 +175,11 @@ layui.use('table', function(){
                                 }
                             });
                             layer.close(index);
-                        } else {
-                            layer.closeAll('loading');
-                            layer.msg('您没有权限噢 😯')
+                            return;
                         }
+                        layer.closeAll('loading');
+                        layer.msg('您没有权限噢 😯')
+                        return;
                     });
                 },
                 error: function () {
@@ -179,10 +187,10 @@ layui.use('table', function(){
                     layer.msg('请求错误!', {icon: 5})
                 }
             });
-        } else {
-            layer.msg("您没有权限噢 😯");
-            layer.closeAll('loading')
+            return;
         }
+        layer.msg("您没有权限噢 😯");
+        layer.closeAll('loading')
     }
   });
 
@@ -212,6 +220,16 @@ layui.use('table', function(){
           layer.msg("您没有权限噢 😯");
           layer.closeAll('loading')
       }
+  });
+
+  E_md5.on("click", function(){ // 字符串md5处理
+      $.get("/tools/md5", {key: E_demoReload.val()}).then(function(resp){
+          if (resp.code != 0) {
+              layui.msg(resp.msg);
+              return;
+          }
+          E_demoReload.val(resp.data.encryptkey);
+      });
   });
 });
 

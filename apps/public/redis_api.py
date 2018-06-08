@@ -124,10 +124,20 @@ def check_connect(host, port, password=None, socket_timeout=socket_timeout):
 def check_redis_connect(name):
     redis_conf = get_redis_conf(name)
     try:
-        logs.debug("host:{0},port:{1},password:{2},timeout:{3}".format(
-            redis_conf.host, redis_conf.port, redis_conf.password, socket_timeout))
-        conn = Connection(host=redis_conf.host, port=redis_conf.port,
-                          password=redis_conf.password, socket_timeout=socket_timeout)
+        logs.debug("host:{0},port:{1},password:{2},timeout:{3}, socket: {4}".format(
+            redis_conf.host, redis_conf.port, redis_conf.password, socket_timeout, redis_conf.socket))
+        if redis_conf.socket is None:
+            if redis_conf.password is not None:
+                conn = Connection(unix_socket_path=redis_conf.socket, socket_timeout=socket_timeout)
+            else:
+                conn = Connection(unix_socket_path=redis_conf.socket, password=redis_conf.password,
+                                  socket_timeout=socket_timeout)
+        else:
+            if redis_conf.password is None:
+                conn = Connection(host=redis_conf.host, port=redis_conf.port, socket_timeout=socket_timeout)
+            else:
+                conn = Connection(host=redis_conf.host, port=redis_conf.port,
+                                  password=redis_conf.password, socket_timeout=socket_timeout)
         conn.connect()
         return True
     except Exception as e:
@@ -144,9 +154,15 @@ def get_cl(redis_name, db_id=0):
     server = get_redis_conf(name=redis_name)
     if server is not False:
         if server.password is None:
-            cl = get_client(host=server.host, port=server.port, db=cur_db_index, password=None)
+            if server.socket is None:
+                cl = get_client(host=server.host, port=server.port, db=cur_db_index, password=None)
+            else:
+                cl = get_client(unix_socket_path=server.socket, db=cur_db_index, password=None)
         else:
-            cl = get_client(host=server.host, port=server.port, db=cur_db_index, password=server.password)
+            if server.socket is None:
+                cl = get_client(host=server.host, port=server.port, db=cur_db_index, password=server.password)
+            else:
+                cl = get_client(unix_socket_path=server.socket, db=cur_db_index, password=server.password)
         return cl, redis_name, cur_db_index
     else:
         return False

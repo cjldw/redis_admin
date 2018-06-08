@@ -8,7 +8,7 @@ from django.db import models
 
 class RedisConf(models.Model):
     name = models.CharField(max_length=10, verbose_name=u"名称")
-    socket = models.CharField(max_length=64, verbose_name=u"socket")
+    socket = models.CharField(max_length=64, default="", verbose_name=u"socket")
     host = models.CharField(max_length=15, verbose_name=u"IP地址")
     port = models.IntegerField(default=6379, verbose_name=u"端口")
     password = models.CharField(null=True, blank=True, max_length=30, verbose_name=u"密码")

@@ -95,4 +95,7 @@ $ python manager.py createsuperuser
 http://custom.domain.com
 
 
+### 预览
 
+![dashbroad](one.png)
+![keyindex](two.png)

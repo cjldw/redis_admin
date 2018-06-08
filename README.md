@@ -1,10 +1,14 @@
 ## redis admin
+
+1. 环境 python 2.7 (python3.x赞不支持, 别瞎折腾)
+2. 项目来源于 [码云, careyjike](https://gitee.com/careyjike_173/redis_web_client)
+3. 对部分功能做了修改
+
 ### 安装
-#### 环境 python 2.7
 
 ```
-mkdir -p /data/wwwroot/ && cd /data/wwwroot
-git clone https://gitee.com/careyjike_173/redis_web_client.git redis_admin
+$ mkdir -p /data/wwwroot/ && cd /data/wwwroot
+$ git clone https://github.com/loovien/redis_admin.git
 cd redis_admin && pip install -r requirements.txt
 ```
 
@@ -12,17 +16,15 @@ cd redis_admin && pip install -r requirements.txt
 
 ```
 $ vim conf/conf.py
-DEBUG = True  //debug模式
-
-LOG_LEVEL = 'INFO'  //日志级别
-
-// 邮件信息
+DEBUG = True  # debug模式
+LOG_LEVEL = 'INFO'  # 日志级别
+# 邮件信息
 mail_host = 'smtp.exmail.qq.com'
 mail_user = 'test@test.com'
 mail_pass = 'xxx'
 mail_receivers = ["test@test.com", "test2@test.com"]
 
-// 数据库信息
+# 数据库信息
 database = {
     "name": "redis_admin",
     "host": "127.0.0.1",
@@ -39,53 +41,58 @@ python manage.py migrate
 ```
 
   
-### nginx
-安装nginx, 使用我的另一个开源安装脚本安装nginx
+### 安装 nginx
 
 ```
-git clone https://gitee.com/careyjike_173/script.git
-cd script && ./installl
-// 根据提示安装nginx
+$ yum install nginx -y
 ```
 配置nginx
 
 ```
   server {
   listen 80;
-  server_name _;
-  access_log /data/wwwlogs/access_nginx.log combined;
+  server_name custom.domain.com;
+  access_log /data/logs/access_redis_admmin.log combined;
   index index.html index.htm index.php;
+
   location / {
-    proxy_pass http://127.0.0.1:8000;
+        proxy_pass http://127.0.0.1:8000;
+        proxy_add_header Host $host;
   }
+
   location /static {
-                expires 7d;
-                autoindex on;
-                add_header Cache-Control provate;
-                alias /data/wwwroot/redis_admin/static;
-        }
+        expires 7d;
+        autoindex on;
+        add_header Cache-Control provate;
+        alias /data/wwwroot/redis_admin/static;
   }
 ```
 
-### 启动
-启动 `redis_admin`
+### 启动 `redis_admin`
 
 ```
 chmod +x start.sh
 ./start.sh start
 ```
+
 启动`nginx`
 
 ```
 service nginx start
 ```
 
-使用`python manage.py createsuperuser` 创建用户  
-**访问浏览器 http://ip/** 
+### 创建超级用户
 
-![](https://gitee.com/careyjike_173/redis_web_client/raw/master/static/img/1.png)
+```bash
+$ python manager.py createsuperuser
+```
+
+更具提示创建好root用户
 
 
-![](https://gitee.com/careyjike_173/redis_web_client/raw/master/static/img/2.png)
+### 访问
 
-![](https://gitee.com/careyjike_173/redis_web_client/raw/master/static/img/3.png)
+http://custom.domain.com
+
+
+

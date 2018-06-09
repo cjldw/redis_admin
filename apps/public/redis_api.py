@@ -24,6 +24,7 @@ from monitor.forms import RedisForm
 client = None
 server_ip = None
 db_index = None
+unix_socket = None
 
 
 def get_redis_conf(name=None, user=None):
@@ -46,24 +47,32 @@ def connect(*args, **kwargs):
 def get_client(*args, **kwargs):
     global server_ip
     global db_index
+    global unix_socket
     if args or kwargs:
         if server_ip is not None and db_index is not None:
-            if kwargs['host'] == server_ip and kwargs['db'] == db_index:
+            if (kwargs['host'] == server_ip and kwargs['db'] == db_index) \
+                    or unix_socket == kwargs['unix_socket_path'] is not None:
                 pass
             else:
+                if kwargs['unix_socket_path'] is not None:
+                    del kwargs['host'], kwargs["port"]
+                    unix_socket = kwargs['unix_socket_path']
+                else:
+                    server_ip = kwargs['host']
+                    db_index = kwargs['db']
                 connect(*args, **kwargs)
-                server_ip = kwargs['host']
-                db_index = kwargs['db']
         else:
             connect(*args, **kwargs)
             server_ip = kwargs['host']
             db_index = kwargs['db']
+            unix_socket = kwargs['unix_socket_path']
 
     global client
     if client:
         return client
     else:
-        connect(host='127.0.0.1', port=6379)
+        # connect(host='127.0.0.1', port=6379)
+        connect(args, kwargs)
         return client
 
 

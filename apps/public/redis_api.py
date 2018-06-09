@@ -55,7 +55,7 @@ def get_client(*args, **kwargs):
                 pass
             else:
                 if kwargs['unix_socket_path'] is not None:
-                    del kwargs['host'], kwargs["port"]
+                    kwargs['host'], kwargs["port"] = None, None
                     unix_socket = kwargs['unix_socket_path']
                 else:
                     server_ip = kwargs['host']
@@ -63,9 +63,12 @@ def get_client(*args, **kwargs):
                 connect(*args, **kwargs)
         else:
             connect(*args, **kwargs)
-            server_ip = kwargs['host']
-            db_index = kwargs['db']
-            unix_socket = kwargs['unix_socket_path']
+            try:
+                server_ip = kwargs['host']
+                db_index = kwargs['db']
+                unix_socket = kwargs['unix_socket_path']
+            except Exception as e:
+                logs.error(e)
 
     global client
     if client:

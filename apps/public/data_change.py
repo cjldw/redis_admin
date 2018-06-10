@@ -79,5 +79,7 @@ class ChangeData(object):
         elif type == 'list':
             self.cl.rpush(key, value)
 
-        if ttl is not None:
-            self.change_ttl(key, ttl)
+        ttl_val = int(ttl)
+        if ttl_val <= 0:
+            return
+        self.change_ttl(key, ttl_val)

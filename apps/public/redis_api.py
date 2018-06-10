@@ -138,7 +138,7 @@ def check_redis_connect(name):
     try:
         logs.info("host:{0},port:{1},password:{2},timeout:{3}, socket: {4}".format(
             redis_conf.host, redis_conf.port, redis_conf.password, socket_timeout, redis_conf.socket))
-        if redis_conf.socket is None:
+        if redis_conf.socket is not None:
             if redis_conf.password is not None:
                 conn = Connection(unix_socket_path=redis_conf.socket, socket_timeout=socket_timeout)
             else:

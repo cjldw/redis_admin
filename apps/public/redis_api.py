@@ -42,6 +42,7 @@ def connect(*args, **kwargs):
     """ 连接Redis数据库，参数和redis-py的Redis类一样 """
     global client
     client = redis.Redis(*args, **kwargs)
+    return client
 
 
 def get_client(*args, **kwargs):

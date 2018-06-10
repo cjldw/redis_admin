@@ -35,7 +35,7 @@ from monitor.views import (GetKeyView,
                            RedisAddView,
                            RedisDelView,
                            )
-from tools.views import MD5View
+from tools.views import (MD5View, RedisConnView, )
 
 urlpatterns = [
     url(r'^$', GetRedisInfo.as_view(), name='index'),
@@ -68,4 +68,5 @@ urlpatterns = [
     url(r'^redis/list/add/$', RedisAddView.as_view(), name="redis_add"),
     url(r'^redis/list/del/$', RedisDelView.as_view(), name="redis_del"),
     url(r'^tools/md5/$', MD5View.as_view(), name="tools_md5"),
+    url(r'^tools/testconn/$', RedisConnView.as_view(), name="tools_testconn"),
 ]

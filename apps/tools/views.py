@@ -29,5 +29,8 @@ class RedisConnView(LoginRequiredMixin, View):
     """ceshi redis"""
 
     def get(self, request):
-        redis_conn = redis.Redis(host="127.0.0.1", port=6379)
-        return JsonResponse(redis_conn)
+        tcpredis = redis.Redis(host="127.0.0.1", port=6379)
+        tcpinfo = tcpredis.info();
+        unixredis = redis.Redis(unix_socket_path="/tmp/redis.sock")
+        unixinfo = unixredis.info()
+        return JsonResponse({"tcpinfo": tcpinfo, "unixinfo": unixinfo})

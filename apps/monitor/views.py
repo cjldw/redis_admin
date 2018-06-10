@@ -42,8 +42,9 @@ class GetRedisInfo(LoginRequiredMixin, View):
                 time_local = time.localtime(info_dict['rdb_last_save_time'])
                 dt = time.strftime("%Y-%m-%d %H:%M:%S", time_local)
                 info_dict['rdb_last_save_time'] = dt
-                info_dict.update(host=client.connection_pool.connection_kwargs['host'])
-                info_dict.update(redis_id=ser.redis)
+                info_dict['socket'] = redis_obj.socket
+                # info_dict.update(host=client.connection_pool.connection_kwargs['host'])
+                # info_dict.update(redis_id=ser.redis)
                 data.append(info_dict)
         return render(request, 'index.html', {
             'data': data,

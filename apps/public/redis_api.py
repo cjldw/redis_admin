@@ -137,7 +137,7 @@ def check_redis_connect(name):
     try:
         logs.info("host:{0},port:{1},password:{2},timeout:{3}, socket: {4}".format(
             redis_conf.host, redis_conf.port, redis_conf.password, socket_timeout, redis_conf.socket))
-        redisconn = redis.Redis(host=redis_conf.host, port=redis_conf.port, password=redis_conf.pssword,
+        redisconn = redis.Redis(host=redis_conf.host, port=redis_conf.port, password=redis_conf.password,
                                 unix_socket_path=redis_conf.socket)
         return redisconn.ping()
     except Exception as e:
@@ -154,8 +154,7 @@ def get_cl(redis_name, db_id=0):
     server = get_redis_conf(name=redis_name)
     if server is not False:
         if server.password is None:
-            if server.socket is None:
-                cl = get_client(host=server.host, port=server.port, db=cur_db_index, password=None,
+            cl = get_client(host=server.host, port=server.port, db=cur_db_index, password=None,
                                 unix_socket_path=server.socket)
         else:
             cl = get_client(host=server.host, port=server.port, db=cur_db_index, password=server.password,

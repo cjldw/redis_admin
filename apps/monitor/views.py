@@ -78,7 +78,7 @@ class CheckRedisContent(LoginRequiredMixin, View):
             status = check_redis_connect(name=redis_obj.name)
             if status is not True:
                 info_dict = {'name': status["redis"].name, 'host': status["redis"].host, 'port': status["redis"].port,
-                             'error': status["message"].message}
+                             'error': status["message"].message, 'socket': status['redis'].unix_socket_path}
                 list.append(info_dict)
         if len(list) != 0:
             data = {'code': 0, 'msg': '', 'data': list}

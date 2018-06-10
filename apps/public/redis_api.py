@@ -122,12 +122,11 @@ def get_all_keys_tree(client=None, key='*', cursor=0, min_num=None, max_num=None
     return key_all
 
 
-def check_connect(host, port, password=None, socket_timeout=socket_timeout):
+def check_connect(host, port, password=None, unix_socket_path=None, socket_timeout=30):
     # from redis import Connection
     try:
-        conn = Connection(host=host, port=port, password=password, socket_timeout=socket_timeout)
-        conn.connect()
-        return True
+        redisconn = redis.Redis(host=host, port=port, password=password, socket_timeout=socket_timeout)
+        return redisconn.ping()
     except Exception as e:
         logs.error(e)
         return e
@@ -138,20 +137,9 @@ def check_redis_connect(name):
     try:
         logs.info("host:{0},port:{1},password:{2},timeout:{3}, socket: {4}".format(
             redis_conf.host, redis_conf.port, redis_conf.password, socket_timeout, redis_conf.socket))
-        if redis_conf.socket is not None:
-            if redis_conf.password is not None:
-                conn = Connection(unix_socket_path=redis_conf.socket, socket_timeout=socket_timeout)
-            else:
-                conn = Connection(unix_socket_path=redis_conf.socket, password=redis_conf.password,
-                                  socket_timeout=socket_timeout)
-        else:
-            if redis_conf.password is None:
-                conn = Connection(host=redis_conf.host, port=redis_conf.port, socket_timeout=socket_timeout)
-            else:
-                conn = Connection(host=redis_conf.host, port=redis_conf.port,
-                                  password=redis_conf.password, socket_timeout=socket_timeout)
-        conn.connect()
-        return True
+        redisconn = redis.Redis(host=redis_conf.host, port=redis_conf.port, password=redis_conf.pssword,
+                                unix_socket_path=redis_conf.socket)
+        return redisconn.ping()
     except Exception as e:
         logs.error(e)
         error = dict(
@@ -175,53 +163,6 @@ def get_cl(redis_name, db_id=0):
         return cl, redis_name, cur_db_index
     else:
         return False
-
-
-class Connection(redis.Connection):
-    """
-    继承redis Connection
-    """
-
-    def connect(self):
-        "Connects to the Redis server if not already connected"
-        if self._sock:
-            return
-        try:
-            sock = self._connect()
-        except socket.error:
-            e = sys.exc_info()[1]
-            raise ConnectionError(self._error_message(e))
-
-        self._sock = sock
-        try:
-            self.on_connect()
-        except RedisError:
-            # clean up after any error in on_connect
-            self.disconnect()
-            raise
-
-        # run any user callbacks. right now the only internal callback
-        # is for pubsub channel/pattern resubscription
-        for callback in self._connect_callbacks:
-            callback(self)
-
-    def on_connect(self):
-        "Initialize the connection, authenticate and select a database"
-        self._parser.on_connect(self)
-
-        # if a password is specified, authenticate
-        if self.password:
-            self.send_command('AUTH', self.password)
-            if nativestr(self.read_response()) != 'OK':
-                logs.error("Invalid Password")
-                raise AuthenticationError('Invalid Password')
-
-        # if a database is specified, switch to it
-        if self.db >= 0:  # 密码为空，切换db判断是否需要认证
-            self.send_command('SELECT', self.db)
-            if nativestr(self.read_response()) != 'OK':
-                raise ConnectionError('Invalid Database')
-
 
 def redis_conf_save(request):
     redis_id = request.POST.get("id", None)
